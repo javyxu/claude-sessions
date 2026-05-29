@@ -1,0 +1,51 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  build-linux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
+      - run: cargo build --release
+      - run: strip target/release/claude-sessions
+      - run: mv target/release/claude-sessions claude-sessions-linux
+      - uses: actions/upload-artifact@v4
+        with:
+          name: claude-sessions-linux
+          path: claude-sessions-linux
+
+  build-macos-x64:
+    runs-on: macos-13
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          target: x86_64-apple-darwin
+      - run: cargo build --release --target x86_64-apple-darwin
+      - run: strip target/x86_64-apple-darwin/release/claude-sessions
+      - run: mv target/x86_64-apple-darwin/release/claude-sessions claude-sessions-macos-x64
+      - uses: actions/upload-artifact@v4
+        with:
+          name: claude-sessions-macos-x64
+          path: claude-sessions-macos-x64
+
+  build-macos-arm64:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          target: aarch64-apple-darwin
+      - run: cargo build --release --target aarch64-apple-darwin
+      - run: strip target/aarch64-apple-darwin/release/claude-sessions
+      - run: mv target/aarch64-apple-darwin/release/claude-sessions claude-sessions-macos-arm64
+      - uses: actions/upload-artifact@v4
+        with:
+          name: claude-sessions-macos-arm64
+          path: claude-sessions-macos-arm64
