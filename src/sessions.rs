@@ -75,6 +75,26 @@ fn read_first_line(file_path: &std::path::Path) -> String {
     "{}".to_string()
 }
 
+/// Read session name from the .jsonl transcript file.
+/// Looks for `agent-name` or `custom-title` type entries (typically in first ~50 lines).
+fn read_session_name(file_path: &std::path::Path) -> Option<String> {
+    let file = fs::File::open(file_path).ok()?;
+    let reader = io::BufReader::new(file);
+    for line in reader.lines().take(100) {
+        let line = line.ok()?;
+        if line.is_empty() {
+            continue;
+        }
+        let val: serde_json::Value = serde_json::from_str(&line).ok()?;
+        match val.get("type")?.as_str()? {
+            "agent-name" => return val.get("agentName")?.as_str().map(String::from),
+            "custom-title" => return val.get("customTitle")?.as_str().map(String::from),
+            _ => continue,
+        }
+    }
+    None
+}
+
 fn get_active_session_ids() -> HashSet<String> {
     let mut ids = HashSet::new();
     let dir = sessions_dir();
@@ -197,7 +217,10 @@ pub fn gather_sessions(project_filter: Option<&str>) -> Vec<SessionMeta> {
                 mtime: mtime_ms,
                 leaf_uuid,
                 file_path: path.clone(),
-                name: name_map.get(&session_id).cloned(),
+                name: name_map
+                    .get(&session_id)
+                    .cloned()
+                    .or_else(|| read_session_name(&path)),
             });
         }
     }
