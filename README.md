@@ -5,11 +5,19 @@ Claude Code session management plugin — list, inspect, and delete sessions acr
 ## Install
 
 ```bash
-# Install from GitHub
-claude plugins add git@github.com:javyxu/claude-sessions.git
+# Add the marketplace
+claude plugins install git@github.com:javyxu/claude-sessions.git
 
-# Or install from local path
-claude plugins add ./claude-sessions
+# Install the plugin from the marketplace
+claude plugins install claude-sessions
+```
+
+Or install from local path:
+
+```bash
+git clone git@github.com:javyxu/claude-sessions.git
+cd claude-sessions && bun install && bun run build
+claude plugins install ./claude-sessions
 ```
 
 ## Commands
