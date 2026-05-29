@@ -1,86 +1,86 @@
 # claude-sessions
 
-Claude Code 会话管理插件 — 跨项目地列出、查看和删除会话。
+Claude Code session management plugin — list, inspect, and delete sessions across projects.
 
-## 安装
+## Install
 
 ```bash
-# 通过 GitHub 安装
+# Install from GitHub
 claude plugins add git@github.com:javyxu/claude-sessions.git
 
-# 或本地路径安装
+# Or install from local path
 claude plugins add ./claude-sessions
 ```
 
-## 命令
+## Commands
 
-| 命令 | 别名 | 说明 |
-|------|------|------|
-| `list` | `ls` | 列出当前项目的会话（默认 20 条） |
-| `show <id>` | `info`、`inspect` | 查看会话详细信息 |
-| `delete <id>` | `rm`、`remove` | 删除会话及关联文件 |
-| `projects` | `prj` | 列出所有项目及会话数量 |
-| `active` | `running` | 查看当前活跃会话 |
+| Command | Aliases | Description |
+|---------|---------|-------------|
+| `list` | `ls` | List sessions for current project (default 20) |
+| `show <id>` | `info`, `inspect` | Show detailed session info |
+| `delete <id>` | `rm`, `remove` | Delete a session and all associated files |
+| `projects` | `prj` | List projects with session counts |
+| `active` | `running` | Show currently active sessions |
 
-## 选项
+## Options
 
-| 选项 | 适用命令 | 说明 |
-|------|----------|------|
-| `--project <name>` | `list` | 按项目名模糊筛选 |
-| `--limit N` | `list` | 限制返回 N 条结果 |
-| `--json` | `list` | 以 JSON Lines 格式输出 |
-| `--all` | `list` | 显示所有项目的会话 |
-| `--force` | `delete` | 强制删除活跃会话 |
+| Option | Applies to | Description |
+|--------|------------|-------------|
+| `--project <name>` | `list` | Filter by project name (fuzzy match) |
+| `--limit N` | `list` | Limit results to N most recent |
+| `--json` | `list` | Output as JSON Lines |
+| `--all` | `list` | Show sessions from all projects |
+| `--force` | `delete` | Force delete an active session |
 
-## 用法示例
+## Usage
 
 ```bash
-# 查看当前项目会话
+# List current project sessions
 claude-sessions list
 
-# 查看所有项目会话
+# List sessions from all projects
 claude-sessions list --all
 
-# JSON 格式输出
+# JSON output
 claude-sessions list --json
 
-# 搜索特定项目
+# Search by project name
 claude-sessions list --project my-app
 
-# 查看会话详情
+# Show session details
 claude-sessions show 24fc85db-xxxx-xxxx-xxxx-xxxxxxxxxxxx
 
-# 删除会话
+# Delete a session
 claude-sessions delete 24fc85db-xxxx-xxxx-xxxx-xxxxxxxxxxxx
 
-# 强制删除活跃会话
+# Force delete an active session
 claude-sessions delete 24fc85db-xxxx-xxxx-xxxx-xxxxxxxxxxxx --force
 
-# 查看项目概览
+# View project summary
 claude-sessions projects
 
-# 查看活跃会话
+# View active sessions
 claude-sessions active
 ```
 
-## 开发
+## Development
 
 ```bash
-# 安装依赖
+# Install dependencies
 bun install
 
-# 编译二进制
+# Build binary
 bun run build
 
-# 类型检查
+# Type check
 bun run typecheck
 ```
 
-## 技术栈
+## Tech Stack
 
 - TypeScript
 - Bun
-- Node.js 文件系统 API
+- Node.js File System API
 
 ## License
 
