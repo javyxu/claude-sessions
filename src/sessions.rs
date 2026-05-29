@@ -229,6 +229,7 @@ pub fn list_sessions(project: Option<&str>, limit: Option<usize>, json: bool, al
         for s in iter {
             let obj = serde_json::json!({
                 "sessionId": s.session_id,
+                "name": s.name,
                 "project": s.project_decoded,
                 "status": s.status,
                 "lineCount": s.line_count,
