@@ -66,21 +66,16 @@ claude-sessions active
 ## 开发
 
 ```bash
-# 安装依赖
-bun install
+# 编译 release 二进制
+cargo build --release
 
-# 编译二进制
-bun run build
-
-# 类型检查
-bun run typecheck
+# 二进制文件位于 target/release/claude-sessions
 ```
 
 ## 技术栈
 
-- TypeScript
-- Bun
-- Node.js 文件系统 API
+- Rust
+- serde / serde_json
 
 ## License
 

@@ -66,21 +66,16 @@ claude-sessions active
 ## Development
 
 ```bash
-# Install dependencies
-bun install
+# Build release binary
+cargo build --release
 
-# Build binary
-bun run build
-
-# Type check
-bun run typecheck
+# The binary will be at target/release/claude-sessions
 ```
 
 ## Tech Stack
 
-- TypeScript
-- Bun
-- Node.js File System API
+- Rust
+- serde / serde_json
 
 ## License
 
