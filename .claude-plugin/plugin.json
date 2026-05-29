@@ -1,0 +1,14 @@
+{
+  "name": "claude-sessions",
+  "version": "1.0.0",
+  "description": "Manage Claude Code sessions — list, inspect, and delete sessions across all projects",
+  "author": {
+    "name": "javyxu"
+  },
+  "license": "MIT",
+  "repository": "https://github.com/javyxu/claude-sessions",
+  "keywords": ["sessions", "cleanup", "management", "utilities"],
+  "commands": [
+    "./commands/session.md"
+  ]
+}
