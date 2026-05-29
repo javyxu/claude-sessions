@@ -91,28 +91,43 @@ pub fn encode_project(cwd: &str) -> String {
 }
 
 pub fn decode_project(encoded: &str) -> String {
-    let decoded = if let Some(rest) = encoded.strip_prefix('-') {
-        format!("/{}", rest.replace('-', "/"))
-    } else {
-        encoded.to_string()
+    // Handle non-absolute paths
+    let rest = match encoded.strip_prefix('-') {
+        Some(r) => r,
+        None => return encoded.to_string(),
     };
 
-    // Validate against filesystem
-    if Path::new(&decoded).exists() {
-        return decoded;
+    // Split on all hyphens — each could be a real '-' or an encoded '/'
+    let segments: Vec<&str> = rest.split('-').collect();
+    let n = segments.len();
+    if n <= 1 {
+        return format!("/{}", rest);
     }
 
-    // Try finding the longest valid prefix
-    let parts: Vec<&str> = decoded.split('/').collect();
-    for i in (1..=parts.len()).rev() {
-        let candidate = parts[..i].join("/");
-        let candidate = if candidate.is_empty() { "/".to_string() } else { candidate };
-        if Path::new(&candidate).exists() {
-            return format!("{} [?]", decoded);
+    // Try all 2^(n-1) interpretations of hyphens (real hyphen vs path separator).
+    // For n segments, there are n-1 gaps between them.
+    let combinations = 1u32 << (n - 1);
+    for mask in 0..combinations {
+        let mut path = String::from("/");
+        path.push_str(segments[0]);
+        for i in 1..n {
+            if (mask >> (i - 1)) & 1 == 1 {
+                // This '-' is a real hyphen in the directory name
+                path.push('-');
+            } else {
+                // This '-' is an encoded path separator
+                path.push('/');
+            }
+            path.push_str(segments[i]);
+        }
+        if Path::new(&path).exists() {
+            return path;
         }
     }
 
-    format!("{} [?]", decoded)
+    // No match found — return the default (all slashes) with indicator
+    let default = format!("/{}", rest.replace('-', "/"));
+    format!("{} [?]", default)
 }
 
 // ── safe JSON ───────────────────────────────────────────────────
