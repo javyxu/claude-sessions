@@ -5,19 +5,11 @@ Claude Code 会话管理插件 — 跨项目地列出、查看和删除会话。
 ## 安装
 
 ```bash
-# 添加 marketplace
-claude plugins install git@github.com:javyxu/claude-sessions.git
+# 1. 添加 marketplace
+claude plugins marketplace add https://github.com/javyxu/claude-sessions.git
 
-# 从 marketplace 安装插件
-claude plugins install claude-sessions
-```
-
-或从本地路径安装：
-
-```bash
-git clone git@github.com:javyxu/claude-sessions.git
-cd claude-sessions && bun install && bun run build
-claude plugins install ./claude-sessions
+# 2. 安装插件
+claude plugins install claude-sessions@claude-sessions
 ```
 
 ## 命令

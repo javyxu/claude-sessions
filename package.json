@@ -4,7 +4,7 @@
   "description": "Session management plugin for Claude Code — list, inspect, and delete sessions across all projects",
   "type": "module",
   "scripts": {
-    "build": "bun build src/cli.ts --compile --outfile bin/session-manager",
+    "build": "bun build src/cli.ts --compile --outfile bin/claude-sessions",
     "build:js": "bun build src/cli.ts --outfile dist/cli.js --target node",
     "typecheck": "tsc --noEmit"
   },

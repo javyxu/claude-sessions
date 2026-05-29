@@ -5,7 +5,7 @@ argument-hint: <list|show|delete|projects|active> [options]
 
 # Session Manager
 
-Manage Claude Code sessions via a standalone binary at `${CLAUDE_PLUGIN_ROOT}/bin/session-manager`.
+Manage Claude Code sessions via a standalone binary at `${CLAUDE_PLUGIN_ROOT}/bin/claude-sessions`.
 
 ## Output Rules
 
@@ -21,7 +21,7 @@ Parse `$ARGUMENTS` to determine the operation (first word). If `$ARGUMENTS` is e
 Run with `--json`, parse the JSON lines, and present as a markdown table:
 
 ```
-"${CLAUDE_PLUGIN_ROOT}/bin/session-manager" list --json
+"${CLAUDE_PLUGIN_ROOT}/bin/claude-sessions" list --json
 ```
 
 | User types | Behavior |
@@ -35,7 +35,7 @@ Run with `--json`, parse the JSON lines, and present as a markdown table:
 ### show
 
 ```
-"${CLAUDE_PLUGIN_ROOT}/bin/session-manager" show <id>
+"${CLAUDE_PLUGIN_ROOT}/bin/claude-sessions" show <id>
 ```
 
 Present as a key-value table.
@@ -43,20 +43,20 @@ Present as a key-value table.
 ### delete
 
 ```
-"${CLAUDE_PLUGIN_ROOT}/bin/session-manager" show <id>    # first
-"${CLAUDE_PLUGIN_ROOT}/bin/session-manager" delete <id>  # after confirming with user
+"${CLAUDE_PLUGIN_ROOT}/bin/claude-sessions" show <id>    # first
+"${CLAUDE_PLUGIN_ROOT}/bin/claude-sessions" delete <id>  # after confirming with user
 ```
 
 Confirm with user before deleting. For force delete:
 
 ```
-"${CLAUDE_PLUGIN_ROOT}/bin/session-manager" delete <id> --force
+"${CLAUDE_PLUGIN_ROOT}/bin/claude-sessions" delete <id> --force
 ```
 
 ### projects
 
 ```
-"${CLAUDE_PLUGIN_ROOT}/bin/session-manager" projects
+"${CLAUDE_PLUGIN_ROOT}/bin/claude-sessions" projects
 ```
 
 Present as a table.
@@ -64,7 +64,7 @@ Present as a table.
 ### active
 
 ```
-"${CLAUDE_PLUGIN_ROOT}/bin/session-manager" active
+"${CLAUDE_PLUGIN_ROOT}/bin/claude-sessions" active
 ```
 
 Present as a table.
