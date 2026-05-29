@@ -31,6 +31,7 @@ fn file_history_dir() -> PathBuf {
 // ── types ───────────────────────────────────────────────────────
 
 #[derive(Debug, Clone)]
+#[allow(dead_code)]
 pub struct SessionMeta {
     pub session_id: String,
     pub project_encoded: String,
