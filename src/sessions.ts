@@ -202,43 +202,51 @@ export function list(opts: {
   }
 
   const displayed = opts.limit ? sessions.slice(0, opts.limit) : sessions;
-  const sep = '─'.repeat(30);
-
-  console.log(`${bold}${blue}=== Claude Code Sessions ===${reset}`);
-  console.log(
-    `${cyan}${'NAME'.padEnd(16)}  ${'SESSION ID'.padEnd(38)}  ${'STATUS'.padEnd(10)}  ` +
-    `${'LINES'.padEnd(6)}  ${'SIZE'.padEnd(7)}  PROJECT${reset}`,
-  );
-  console.log(
-    `${'─'.repeat(16)}  ${'─'.repeat(38)}  ${'─'.repeat(10)}  ${'─'.repeat(6)}  ` +
-    `${'─'.repeat(7)}  ${sep}`,
-  );
-
-  for (const s of displayed) {
-    const icon = s.status === 'active'
-      ? `${green}● active  ${reset}`
-      : `${yellow}○ idle    ${reset}`;
-
-    const name = s.name || '—';
-
-    console.log(
-      `${name.slice(0, 16).padEnd(16)}  ` +
-      `${bold}${s.sessionId}${reset}  ` +
-      `${icon}  ` +
-      `${String(s.lineCount).padEnd(6)}  ` +
-      `${humanSize(s.fileSize).padEnd(7)}  ` +
-      `${magenta}${s.projectDecoded}${reset}`,
-    );
-  }
 
   if (sessions.length === 0) {
     console.log(`${yellow}No sessions found.${reset}`);
-  } else {
+    return;
+  }
+
+  // Column widths
+  const IDX_W = 5;
+  const ID_W = 10;
+  const STATUS_W = 11;
+  const LINES_W = 7;
+  const SIZE_W = 8;
+  const DATE_W = 15;
+
+  const line = '─';
+  const sep = `${line.repeat(IDX_W)}┼${line.repeat(ID_W)}┼${line.repeat(STATUS_W)}┼${line.repeat(LINES_W)}┼${line.repeat(SIZE_W)}┼${line.repeat(DATE_W)}`;
+
+  // Header
+  console.log(
+    `${'#'.padEnd(IDX_W)} │ ${'Session ID'.padEnd(ID_W)} │ ${'Status'.padEnd(STATUS_W)} │ ` +
+    `${'Lines'.padStart(LINES_W)} │ ${'Size'.padStart(SIZE_W)} │ ${'Last Modified'.padEnd(DATE_W)}`,
+  );
+  console.log(sep);
+
+  for (let i = 0; i < displayed.length; i++) {
+    const s = displayed[i];
+    const idx = String(i + 1).padStart(IDX_W);
+    const shortId = s.sessionId.slice(0, 8);
+    const statusStr = s.status === 'active'
+      ? `${green}🟢 active ${reset}`
+      : `⚫ inactive `;
+    const linesStr = String(s.lineCount).padStart(LINES_W);
+    const sizeStr = humanSize(s.fileSize).padStart(SIZE_W);
+    const dateStr = formatTime(s.mtime).slice(0, 10).padEnd(DATE_W);
+
     console.log(
-      `\n${bold}${sessions.length} session(s) total${reset}, ` +
-      `${green}${activeCount} active${reset}`,
+      `${idx} │ ${bold}${shortId}${reset} │ ${statusStr} │ ` +
+      `${linesStr} │ ${sizeStr} │ ${dateStr}`,
     );
   }
+
+  console.log(
+    `\n${bold}${sessions.length} session(s)${reset} — ` +
+    `${green}${activeCount} active${reset}, ${sessions.length - activeCount} inactive`,
+  );
 }
 
 export function show(sessionId: string): void {

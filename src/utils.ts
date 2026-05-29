@@ -16,9 +16,9 @@ export const reset = `${OSC}[0m`;
 
 /** Format bytes to human-readable string. */
 export function humanSize(bytes: number): string {
-  if (bytes < 1024) return `${bytes}B`;
-  if (bytes < 1048576) return `${Math.round(bytes / 1024)}K`;
-  return `${(bytes / 1048576).toFixed(1)}M`;
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1048576) return `${Math.round(bytes / 1024)} KB`;
+  return `${(bytes / 1048576).toFixed(1)} MB`;
 }
 
 /** Format a Unix millisecond timestamp to ISO-like string. */
