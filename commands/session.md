@@ -9,13 +9,15 @@ Manage Claude Code sessions via a standalone binary at `${CLAUDE_PLUGIN_ROOT}/bi
 
 ## Output Rules
 
-- **Never show raw command output.** Always parse JSON output and present results as clean markdown.
+- **CRITICAL: Do NOT show the raw Bash command, JSON output, or truncated preview.** Run the command silently, parse the JSON in your head, and ONLY output the formatted table.
 - **Always use table format** — even for a single session. Every result gets a table.
 - **Table columns (list):** `#` | Name | Session ID | Status | Lines | Size | Last Modified
   - Name: show `—` if null
   - Status: use 🟢 active / ⚫ inactive
   - Size: format with KB/MB
   - Last Modified: show date only (YYYY-MM-DD) from mtime
+- **Table columns (list --all):** `#` | Name | Session ID | Project | Status | Lines | Size | Last Modified
+  (same formatting, add Project column)
 
 ## Command Routing
 

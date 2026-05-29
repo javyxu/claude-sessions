@@ -7,7 +7,7 @@
     {
       "name": "claude-sessions",
       "description": "Manage Claude Code sessions — list, inspect, and delete sessions across all projects",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "source": "./"
     }
   ]
