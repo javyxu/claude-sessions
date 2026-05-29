@@ -1,15 +1,14 @@
 # claude-sessions
 
-Claude Code session management plugin — list, inspect, and delete sessions across projects.
+Manage Claude Code sessions via CLI — list, inspect, and delete sessions across projects.
 
 ## Install
 
-```bash
-# 1. Add the marketplace
-claude plugins marketplace add https://github.com/javyxu/claude-sessions.git
+Download the binary for your platform from [Releases](https://github.com/javyxu/claude-sessions/releases), or build from source:
 
-# 2. Install the plugin
-claude plugins install claude-sessions@claude-sessions
+```bash
+cargo build --release
+# Binary at target/release/claude-sessions
 ```
 
 ## Commands
