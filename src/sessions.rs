@@ -76,23 +76,53 @@ fn read_first_line(file_path: &std::path::Path) -> String {
 }
 
 /// Read session name from the .jsonl transcript file.
-/// Looks for `agent-name` or `custom-title` type entries (typically in first ~50 lines).
+/// Priority: agent-name > custom-title > ai-title > first user prompt.
+/// Returns the chronologically last match within each priority tier.
 fn read_session_name(file_path: &std::path::Path) -> Option<String> {
     let file = fs::File::open(file_path).ok()?;
     let reader = io::BufReader::new(file);
-    for line in reader.lines().take(100) {
+    let mut name = None;
+    let mut first_prompt = None;
+    for line in reader.lines().take(200) {
         let line = line.ok()?;
         if line.is_empty() {
             continue;
         }
         let val: serde_json::Value = serde_json::from_str(&line).ok()?;
-        match val.get("type")?.as_str()? {
-            "agent-name" => return val.get("agentName")?.as_str().map(String::from),
-            "custom-title" => return val.get("customTitle")?.as_str().map(String::from),
+        let ty = val.get("type")?.as_str()?;
+        match ty {
+            "agent-name" => {
+                name = val.get("agentName")?.as_str().map(String::from);
+            }
+            "custom-title" => {
+                // Only use custom-title if no agent-name yet
+                if name.is_none() {
+                    name = val.get("customTitle")?.as_str().map(String::from);
+                }
+            }
+            "ai-title" => {
+                // Only use ai-title if no agent-name or custom-title yet
+                if name.is_none() {
+                    name = val.get("aiTitle")?.as_str().map(String::from);
+                }
+            }
+            "user" => {
+                if first_prompt.is_none()
+                    && val.get("isMeta") != Some(&serde_json::Value::Bool(true))
+                {
+                    first_prompt = val
+                        .get("message")
+                        .and_then(|m| m.get("content"))
+                        .and_then(|c| c.as_str())
+                        .map(|s| s.lines().next().unwrap_or(s))
+                        .map(|s| s.trim().to_string())
+                        .filter(|s| !s.is_empty());
+                }
+            }
             _ => continue,
         }
     }
-    None
+    name.or(first_prompt)
 }
 
 fn get_active_session_ids() -> HashSet<String> {
