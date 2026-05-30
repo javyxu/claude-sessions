@@ -588,6 +588,91 @@ fn do_delete(files: &[PathBuf], session_id: &str) {
     );
 }
 
+pub fn clear_sessions(project: Option<&str>, force: bool) {
+    let sessions = gather_sessions(project);
+
+    if sessions.is_empty() {
+        println!("{YELLOW}No sessions found to clear.{RESET}");
+        return;
+    }
+
+    // Collect all files to delete
+    let mut to_delete: Vec<PathBuf> = Vec::new();
+    for s in &sessions {
+        to_delete.push(s.file_path.clone());
+        let env_path = session_env_dir().join(&s.session_id);
+        if env_path.exists() {
+            to_delete.push(env_path);
+        }
+        if let Ok(history_entries) = fs::read_dir(file_history_dir()) {
+            for entry in history_entries.flatten() {
+                if entry.file_name().to_string_lossy().starts_with(&s.session_id) {
+                    to_delete.push(entry.path());
+                }
+            }
+        }
+        if let Ok(session_entries) = fs::read_dir(sessions_dir()) {
+            for entry in session_entries.flatten() {
+                let path = entry.path();
+                if path.extension().map_or(true, |e| e != "json") {
+                    continue;
+                }
+                if let Ok(content) = fs::read_to_string(&path) {
+                    if let Ok(val) = serde_json::from_str::<serde_json::Value>(&content) {
+                        if val["sessionId"].as_str() == Some(&s.session_id) {
+                            to_delete.push(path);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // Preview
+    let scope = if let Some(p) = project {
+        decode_project(p)
+    } else {
+        "ALL projects".to_string()
+    };
+    println!("{BOLD}{RED}=== Preparing to clear sessions ==={RESET}");
+    println!("Scope:    {BOLD}{}{RESET}", scope);
+    println!("Sessions: {BOLD}{}{RESET}", sessions.len());
+    println!("Files:    {BOLD}{}{RESET}", to_delete.len());
+
+    if !force {
+        let answer = prompt(&format!(
+            "\n{RED}Delete {} sessions and {} files? (y/N){RESET}: ",
+            sessions.len(),
+            to_delete.len()
+        ));
+        if answer.to_lowercase() != "y" {
+            println!("Aborted.");
+            return;
+        }
+    }
+
+    let mut ok = 0usize;
+    let mut fail = 0usize;
+    for f in &to_delete {
+        let result = if f.is_dir() {
+            fs::remove_dir_all(f)
+        } else {
+            fs::remove_file(f)
+        };
+        match result {
+            Ok(()) => ok += 1,
+            Err(e) => {
+                fail += 1;
+                eprintln!("{RED}✗ Failed:{RESET} {} ({})", f.display(), e);
+            }
+        }
+    }
+
+    println!(
+        "\n{BOLD}{GREEN}Cleared {ok} files ({fail} failed){RESET}"
+    );
+}
+
 pub fn list_projects() {
     let active_ids = get_active_session_ids();
 

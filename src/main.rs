@@ -59,6 +59,7 @@ fn usage() {
     --json              Output as JSON Lines
   show <id>             Show detailed session info
   delete <id> [--force] Delete a session and all associated files
+  clear [--force]       Clear all sessions, or --project <name> for one project
   projects              List projects with session counts
   active, running       Show currently active sessions
   help                  Print this message"
@@ -88,6 +89,9 @@ fn main() {
                 std::process::exit(1);
             }
             remove_session(&positional[0], opts.force);
+        }
+        Some("clear") => {
+            clear_sessions(opts.project.as_deref(), opts.force);
         }
         Some("projects") | Some("prj") => {
             list_projects();
