@@ -14,11 +14,10 @@ jobs:
       - uses: actions-rust-lang/setup-rust-toolchain@v1
       - run: cargo build --release
       - run: strip target/release/claude-sessions
-      - run: mv target/release/claude-sessions claude-sessions-linux
       - uses: actions/upload-artifact@v4
         with:
           name: claude-sessions-linux
-          path: claude-sessions-linux
+          path: target/release/claude-sessions
 
   build-macos-x64:
     runs-on: macos-13
@@ -29,11 +28,10 @@ jobs:
           target: x86_64-apple-darwin
       - run: cargo build --release --target x86_64-apple-darwin
       - run: strip target/x86_64-apple-darwin/release/claude-sessions
-      - run: mv target/x86_64-apple-darwin/release/claude-sessions claude-sessions-macos-x64
       - uses: actions/upload-artifact@v4
         with:
           name: claude-sessions-macos-x64
-          path: claude-sessions-macos-x64
+          path: target/x86_64-apple-darwin/release/claude-sessions
 
   build-macos-arm64:
     runs-on: macos-latest
@@ -44,8 +42,26 @@ jobs:
           target: aarch64-apple-darwin
       - run: cargo build --release --target aarch64-apple-darwin
       - run: strip target/aarch64-apple-darwin/release/claude-sessions
-      - run: mv target/aarch64-apple-darwin/release/claude-sessions claude-sessions-macos-arm64
       - uses: actions/upload-artifact@v4
         with:
           name: claude-sessions-macos-arm64
-          path: claude-sessions-macos-arm64
+          path: target/aarch64-apple-darwin/release/claude-sessions
+
+  release:
+    needs: [build-linux, build-macos-x64, build-macos-arm64]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: claude-sessions-*
+          merge-multiple: true
+      - run: |
+          mv claude-sessions claude-sessions-linux-x86_64
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            claude-sessions-linux-x86_64
+            claude-sessions-macos-x64
+            claude-sessions-macos-arm64
