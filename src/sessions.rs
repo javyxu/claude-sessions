@@ -75,6 +75,30 @@ fn read_first_line(file_path: &std::path::Path) -> String {
     "{}".to_string()
 }
 
+/// Strip HTML/XML tags from a string, keeping inner text.
+fn strip_tags(s: &str) -> String {
+    let mut result = String::new();
+    let mut in_tag = false;
+    for ch in s.chars() {
+        match ch {
+            '<' => in_tag = true,
+            '>' => in_tag = false,
+            _ if !in_tag => result.push(ch),
+            _ => {}
+        }
+    }
+    result.trim().to_string()
+}
+
+/// Truncate a string to `max` width, appending "…" if cut.
+fn truncate(s: &str, max: usize) -> String {
+    if s.len() <= max {
+        s.to_string()
+    } else {
+        format!("{}…", &s[..max - 1])
+    }
+}
+
 /// Read session name from the .jsonl transcript file.
 /// Priority: agent-name > custom-title > ai-title > first user prompt.
 /// Returns the chronologically last match within each priority tier.
@@ -115,7 +139,7 @@ fn read_session_name(file_path: &std::path::Path) -> Option<String> {
                         .and_then(|m| m.get("content"))
                         .and_then(|c| c.as_str())
                         .map(|s| s.lines().next().unwrap_or(s))
-                        .map(|s| s.trim().to_string())
+                        .map(strip_tags)
                         .filter(|s| !s.is_empty());
                 }
             }
@@ -306,11 +330,11 @@ pub fn list_sessions(project: Option<&str>, limit: Option<usize>, json: bool, al
         "{BOLD}{BLUE}=== Claude Code Sessions ==={RESET}"
     );
     println!(
-        "{CYAN}{:16}  {:38}  {:10}  {:6}  {:7}  PROJECT{RESET}",
+        "{CYAN}{:48}  {:38}  {:10}  {:6}  {:7}  PROJECT{RESET}",
         "NAME", "SESSION ID", "STATUS", "LINES", "SIZE"
     );
     println!(
-        "{:─<16}  {:─<38}  {:─<10}  {:─<6}  {:─<7}  {:─<30}",
+        "{:─<48}  {:─<38}  {:─<10}  {:─<6}  {:─<7}  {:─<30}",
         "", "", "", "", "", ""
     );
 
@@ -321,12 +345,12 @@ pub fn list_sessions(project: Option<&str>, limit: Option<usize>, json: bool, al
             (format!("{YELLOW}○{RESET}"), "idle")
         };
 
-        let name = s.name.as_deref().unwrap_or("—");
+        let name = truncate(s.name.as_deref().unwrap_or("—"), 48);
         let id_display = format!("{BOLD}{}{RESET}", s.session_id);
 
         println!(
-            "{:16}  {:38}  {} {:7}  {:6}  {:7}  {MAGENTA}{}{RESET}",
-            &name[..name.len().min(16)],
+            "{:48}  {:38}  {} {:7}  {:6}  {:7}  {MAGENTA}{}{RESET}",
+            name,
             id_display,
             icon,
             status_text,
